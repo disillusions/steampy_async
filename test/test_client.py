@@ -10,18 +10,19 @@ from steampy.utils import account_id_to_steam_id
 
 
 class Credentials:
-    login = 'monsterwheel01'
-    password = '3df7bpgzPS'
-    api_key = '5C46191EC0B67A55AD574881D5C99EF4'
+    login = ''
+    password = ''
+    api_key = ''
 
 
 class TestSteamClient:
 
     credentials = Credentials()
     steam_guard_file = '''{
-        "steam_id": "76561197991861652",
-        "shared_secret": "zkDhn61kj8WD1PDlopfEIqR9vWY=",
-        "identity_secret": "uaNLaqNO8PPK6phxwbkmBk4uSDk="}'''
+        "steam_id": "",
+        "shared_secret": "",
+        "identity_secret": ""}'''
+
     @pytest.mark.asyncio
     async def test_login(self):
         client = SteamClient(self.credentials.api_key)
@@ -31,13 +32,13 @@ class TestSteamClient:
     async def test_is_session_alive(self):
         client = SteamClient(self.credentials.api_key)
         await client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        self.assertTrue(await client.is_session_alive())
+        assert (await client.is_session_alive()) == True
 
     @pytest.mark.asyncio
     async def test_logout(self):
         client = SteamClient(self.credentials.api_key)
         await client.login(self.credentials.login, self.credentials.password, self.steam_guard_file)
-        self.assertTrue(await client.is_session_alive())
+        assert (await client.is_session_alive()) == True
         await client.logout()
 
     @pytest.mark.asyncio

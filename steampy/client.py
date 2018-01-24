@@ -40,11 +40,15 @@ class SteamClient:
         self.market = SteamMarket(self._session)
         self.chat = SteamChat(self._session)
 
+    def __del__(self):
+        try:
+            self._session.close()
+        except:
+            pass
+
     async def login(
             self, username: str, password: str, steam_guard: str) -> None:
-        print('\nI am logging in \n')
         self.steam_guard = await guard.load_steam_guard(steam_guard)
-        print('\nI am loaded guard \n')
         self.username = username
         login_executor = LoginExecutor(
             username,
@@ -63,7 +67,6 @@ class SteamClient:
         url = LoginExecutor.STORE_URL + '/logout/'
         params = {'sessionid': await self._get_session_id()}
         async with self._session.post(url, params) as response:
-            # print(response.text)
             await response.text
         if await self.is_session_alive():
             raise Exception("Logout unsuccessful")
@@ -135,7 +138,6 @@ class SteamClient:
                    'X-Prototype-Version': '1.7'}
 
         url = SteamUrl.COMMUNITY_URL + '/tradeoffer/new/partnerinventory/'
-        print(url, params, headers)
         async with self._session.get(
                 url, params=params, headers=headers) as response:
             response_dict = json.loads(await response.text())
@@ -378,3 +380,21 @@ class SteamClient:
     @staticmethod
     async def _get_trade_offer_url(trade_offer_id: str) -> str:
         return SteamUrl.COMMUNITY_URL + '/tradeoffer/' + trade_offer_id
+
+    @login_required
+    async def is_trade_link_correct(self, trade_link=None, steam_id=None):
+        headers = {'Referer': SteamUrl.COMMUNITY_URL + urlparse(trade_link).path,
+                   'Origin': SteamUrl.COMMUNITY_URL}
+        try:
+            async with self._session.get(trade_link, headers=headers) as response:
+                text = await response.text()
+        except Exception as e:
+            return {'Error': e.__class__.__name__}
+
+        their_steam_id = str(text_between(text, "var g_ulTradePartnerSteamID = '", "';"))
+
+        result = {'equal': True}
+        if steam_id != their_steam_id:
+            result = {'equal': False}
+
+        return result
