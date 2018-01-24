@@ -383,8 +383,9 @@ class SteamClient:
 
     @login_required
     async def is_trade_link_correct(self, trade_link=None, steam_id=None):
-        headers = {'Referer': SteamUrl.COMMUNITY_URL + urlparse(trade_link).path,
-                   'Origin': SteamUrl.COMMUNITY_URL}
+        headers = {
+            'Referer': SteamUrl.COMMUNITY_URL + urlparse.urlparse(trade_link).path,
+            'Origin': SteamUrl.COMMUNITY_URL}
         try:
             async with self._session.get(trade_link, headers=headers) as response:
                 text = await response.text()
