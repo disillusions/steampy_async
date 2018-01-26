@@ -129,6 +129,8 @@ class SteamClient:
                   'partner': partner_steam_id,
                   'appid': int(game.app_id),
                   'contextid': game.context_id}
+        print('----params-----')
+        print(params)
         partner_account_id = steam_id_to_account_id(partner_steam_id)
 
         ref_url = '{}/tradeoffer/new/?partner={}'.format(
