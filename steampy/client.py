@@ -156,7 +156,7 @@ class SteamClient:
     async def get_trade_offers_summary(self) -> dict:
         params = {'key': self._api_key}
         return json.loads(await self.api_call(
-            'GET', 'CEconService', 'GetTradeOffersSummary', 'v1', params))
+            'GET', 'IEconService', 'GetTradeOffersSummary', 'v1', params))
 
     async def get_trade_offers(self, merge: bool = True):
         params = {'key': self._api_key,
@@ -168,7 +168,7 @@ class SteamClient:
                   'historical_only': 0,
                   'time_historical_cutoff': ''}
         response = json.loads(await self.api_call(
-            'GET', 'CEconService', 'GetTradeOffers', 'v1', params))
+            'GET', 'IEconService', 'GetTradeOffers', 'v1', params))
         response = await self._filter_non_active_offers(response)
         if merge:
             response = await merge_items_with_descriptions_from_offers(response)
@@ -190,7 +190,7 @@ class SteamClient:
                   'language': 'english'}
         response = json.loads(
             await self.api_call(
-                'GET', 'CEconService', 'GetTradeOffer', 'v1', params))
+                'GET', 'IEconService', 'GetTradeOffer', 'v1', params))
         if merge and "descriptions" in response['response']:
             descriptions = {
                 await get_description_key(offer): offer
